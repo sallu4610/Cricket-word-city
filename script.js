@@ -130,6 +130,7 @@ nextBtn.addEventListener("click", () => {
     alert("You completed all levels!");
   }
 });
+document.getElementById("game").style.backgroundImage = `url('${imageUrls[currentLevel]}')`;
 
 document.getElementById("hint-btn").addEventListener("click", () => {
   alert(levels[currentLevel].hint);
