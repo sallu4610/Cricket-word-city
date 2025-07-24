@@ -131,6 +131,8 @@ nextBtn.addEventListener("click", () => {
   }
 });
 
+document.getElementById("game").style.backgroundImage = `url('${imageUrls[currentLevel]}')`;
+
 document.getElementById("hint-btn").addEventListener("click", () => {
   alert(levels[currentLevel].hint);
 });
