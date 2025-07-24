@@ -1,10 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Cricket Word City</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    #game {
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+    }
+    #crossword {
+      display: grid;
+      gap: 5px;
+      justify-content: center;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #555;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      color: #fff;
+      font-weight: bold;
+    }
+    .filled {
+      background: #ffcc00;
+      color: #000;
+    }
+    #letter-circle {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .letter {
+      width: 50px;
+      height: 50px;
+      margin: 6px;
+      border-radius: 50%;
+      background: #222;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    #hint, #result {
+      margin-top: 10px;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #ffcc00;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <div id="game">
@@ -15,8 +92,140 @@
     <button onclick="nextLevel()">Next Level ▶</button>
     <div id="result"></div>
   </div>
-  <script src="script.js"></script>
-  <link rel="stylesheet" href="styles.css">
 
+  <script>
+const imageUrls = [
+  "https://i.postimg.cc/BLVMxPHM/image.jpg", "https://i.postimg.cc/HJ3SkhxG/image.jpg",
+  "https://i.postimg.cc/qhR1hxhN/image.jpg", "https://i.postimg.cc/JHHKK7Qm/image.jpg",
+  "https://i.postimg.cc/WdvS6vqL/image.jpg", "https://i.postimg.cc/8s7yTwg3/image.jpg",
+  "https://i.postimg.cc/PN0SJZtq/image.jpg", "https://i.postimg.cc/JGJPknn5/image.jpg",
+  "https://i.postimg.cc/TKJ0t4ny/image.jpg", "https://i.postimg.cc/Ty29FJct/image.jpg",
+  "https://i.postimg.cc/KK9N23qx/image.jpg", "https://i.postimg.cc/XGmkZS6P/image.jpg",
+  "https://i.postimg.cc/tn6tWSX4/image.jpg", "https://i.postimg.cc/9RrBFXKT/image.jpg",
+  "https://i.postimg.cc/t7nzKThG/image.jpg", "https://i.postimg.cc/cvh7R8Nw/image.jpg",
+  "https://i.postimg.cc/fJ4vDNKt/image.jpg", "https://i.postimg.cc/hJGLpPSw/image.jpg",
+  "https://i.postimg.cc/bsQ9vBC6/image.jpg", "https://i.postimg.cc/FYNgkVwh/image.jpg"
+];
+
+const levels = [
+  { words: ["SIX", "SPIN", "SWING", "STRIKE"], hint: "Powerful shots & tricky deliveries" },
+  { words: ["SWEEP", "WICKET", "STUMP", "SWING"], hint: "Dismissals & sweep shots" },
+  { words: ["PACE", "SPIN", "SLIP", "SEAM"], hint: "Bowler’s magic tools" },
+  { words: ["BATSMAN", "BOWLER", "ALLROUNDER", "CAPTAIN"], hint: "Who’s who on field" },
+  { words: ["CENTURY", "SCORE", "RECORD", "STRIKE"], hint: "Record-breaking runs" },
+  { words: ["RUNOUT", "THROW", "CATCH", "EDGE"], hint: "Fielding brilliance" },
+  { words: ["MATCH", "SERIES", "TOURNAMENT", "FINAL"], hint: "Cricket structures" },
+  { words: ["REVIEW", "UMPIRE", "DRS", "APPEAL"], hint: "Controversial calls" },
+  { words: ["TOSS", "TEST", "T20", "ODI"], hint: "Formats & starts" },
+  { words: ["CHAMPION", "ICON", "LEGEND", "HERO"], hint: "Greatest names" },
+  { words: ["LORDS", "MCG", "WANKHEDE", "EDEN"], hint: "Famous stadiums" },
+  { words: ["BOUNCER", "YORKER", "FLIPPER", "DOOSRA"], hint: "Deadliest deliveries" },
+  { words: ["INNINGS", "SESSION", "PITCH", "CREASE"], hint: "Game setup" },
+  { words: ["POWERPLAY", "DEBUT", "PRESSURE", "COMEBACK"], hint: "Match situations" },
+  { words: ["CELEBRATE", "GLORY", "HISTORY", "TROPHY"], hint: "Winning moments" },
+  { words: ["KEEPER", "FIELDER", "THROW", "STUMP"], hint: "Defenders on field" },
+  { words: ["APPEAL", "LBW", "EDGE", "UMPIRE"], hint: "Deciding moments" },
+  { words: ["MANOFMATCH", "TROPHY", "WORLD", "IPL"], hint: "Rewards & fame" },
+  { words: ["OPENER", "TAILENDER", "BOWLER", "STRUGGLE"], hint: "Start to end" },
+  { words: ["ASHES", "ODI", "T20", "WORLD"], hint: "Biggest rivalries" }
+];
+
+let currentLevel = 0;
+let selectedLetters = "";
+let guessedWords = [];
+
+function shuffle(str) {
+  return str.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+function buildGrid(words) {
+  const crossword = document.getElementById('crossword');
+  crossword.innerHTML = '';
+  const allLetters = words.join('');
+  const size = Math.max(...words.map(w => w.length));
+  crossword.style.gridTemplateColumns = `repeat(${size}, 40px)`;
+
+  for (let word of words) {
+    for (let ch of word) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.letter = ch.toUpperCase();
+      cell.textContent = '';
+      crossword.appendChild(cell);
+    }
+  }
+}
+
+function renderLevel() {
+  const level = levels[currentLevel];
+  buildGrid(level.words);
+  guessedWords = [];
+  selectedLetters = '';
+  document.getElementById("hint").textContent = '';
+  document.getElementById("result").textContent = '';
+  document.getElementById("game").style.backgroundImage = `url('${imageUrls[currentLevel]}')`;
+
+  const uniqueLetters = shuffle(level.words.join('').toUpperCase());
+  const circle = document.getElementById('letter-circle');
+  circle.innerHTML = '';
+
+  for (let ch of [...new Set(uniqueLetters)]) {
+    const span = document.createElement('div');
+    span.className = 'letter';
+    span.textContent = ch;
+    span.onclick = () => selectLetter(ch);
+    circle.appendChild(span);
+  }
+}
+
+function selectLetter(ch) {
+  selectedLetters += ch;
+  checkWord();
+}
+
+function checkWord() {
+  const level = levels[currentLevel];
+  const word = selectedLetters.toUpperCase();
+  if (level.words.includes(word) && !guessedWords.includes(word)) {
+    revealWord(word);
+    guessedWords.push(word);
+    selectedLetters = '';
+    if (guessedWords.length === 4) {
+      document.getElementById("result").textContent = "🎉 " + level.hint;
+    }
+  } else if (word.length > 12) {
+    selectedLetters = '';
+  }
+}
+
+function revealWord(word) {
+  const cells = document.querySelectorAll('.cell');
+  let index = 0;
+  for (let i = 0; i < cells.length; i++) {
+    if (cells[i].dataset.letter === word[index]) {
+      cells[i].textContent = word[index];
+      cells[i].classList.add('filled');
+      index++;
+      if (index >= word.length) break;
+    }
+  }
+}
+
+function showHint() {
+  const level = levels[currentLevel];
+  document.getElementById("hint").textContent = "Hint: " + level.hint;
+}
+
+function nextLevel() {
+  if (currentLevel + 1 < levels.length) {
+    currentLevel++;
+    renderLevel();
+  } else {
+    alert("🏆 All 20 cricket moments completed!");
+  }
+}
+
+window.onload = () => renderLevel();
+  </script>
 </body>
 </html>
